@@ -54,7 +54,7 @@ def sendRequestToSlack(slack_data):
             % (response.status_code, response.text)
         )
     else: 
-        print(f'payload: {slack_data} {type(slack_data)}')
+        print(f'payload: {slack_data} status_code: {response.status_code}')
 
 def pytest_sessionfinish(session, exitstatus):
     if exitstatus == 0:
