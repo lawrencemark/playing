@@ -7,7 +7,7 @@ from app import app as flask_app
 
 token = os.getenv('token')
 key = os.getenv('key')
-slackurlpram = os.environ['slackuripram']
+slackurlpram = os.getenv['slackuripram']
 
 @pytest.fixture
 def app():
