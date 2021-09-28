@@ -12,30 +12,33 @@ ENV FLASK_ENV=development
 ENV PATH="/root/.poetry/bin/:/srv/www/.venv/bin:/srv/www/todo_app:${PATH}" 
 
 
-
-#PULL THE LATEST POETRY SCRIPT AND INSTALL
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-
-
-
-
 FROM base AS production
 #PRODUCTION RELEASE WITH MINIMAL CONFIGURATION
-RUN mkdir /srv/www
+RUN apt-get update && apt-get install -y sudo
+RUN  useradd -m nonroot && echo "nonroot:nonroot" | chpasswd && adduser nonroot sudo 
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER nonroot
+ENV PATH="~/.poetry/bin/:/srv/www/.venv/bin:/srv/www/todo_app:${PATH}"
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+RUN sudo mkdir /srv/www
+RUN sudo chown nonroot /srv/www
 WORKDIR /srv/www
 COPY ./poetry.toml .
 COPY ./pyproject.toml .
 COPY ./scripts ./scripts
 COPY ./todo_app ./todo_app
+RUN ~/.poetry/bin/poetry install --no-root
+WORKDIR /srv/www/todo_app
+ENTRYPOINT [ "/bin/bash" ]
+#CMD gunicorn --bind 0.0.0.0:5000 app:app
 #RUNNER SCRIPT
-ENV APPLICATIONTYPE=PRODUCTION
-WORKDIR /srv/www/
-RUN poetry install
-ENTRYPOINT [ "/srv/www/scripts/setupenv.sh" ]
+#ENV APPLICATIONTYPE=PRODUCTION
+#ENTRYPOINT [ "/srv/www/scripts/setupenv.sh" ]
 
 
 FROM base as development
 #LOCAL DEVELEOPMENT RELEASE WITH SIMPLE WERKZEUG(TOOL) WEBSERVER
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 RUN apt-get update && apt-get install -qqy nano
 #RUNNER SCRIPT
 ENV APPLICATIONTYPE=DEVELOPMENT
@@ -45,6 +48,7 @@ ENTRYPOINT [ "/srv/www/scripts/setupenv.sh" ]
 
 
 FROM base AS test
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 WORKDIR /tmp
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
