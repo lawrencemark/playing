@@ -1,21 +1,21 @@
-FROM ubuntu:latest
-ENV PATH="/root/.poetry/bin/:/srv/www/.venv/bin:/srv/www/todo_app:${PATH}" 
-RUN apt-get update -y
-RUN apt-get install -y python3-pip python3-dev build-essential curl
-RUN ln /usr/bin/python3 /usr/bin/python
-WORKDIR /tmp
-#COPY ./requirements.txt .
-#RUN pip install -r requirements.txt
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+#DOCKERFILE SPECIFICIALLY FOR HEROKU AND USING A NONROOT USER FOR INSTALLATION
+#ADDING IN THE ABILITY TO ENSURE A SUCCESSFUL LAUNCH WITHOUT ROOT
+
+FROM python:3.9 as base
 RUN mkdir /srv/www
 WORKDIR /srv/www
 COPY ./poetry.toml .
 COPY ./pyproject.toml .
+COPY ./version.txt .
 COPY ./todo_app ./todo_app
-WORKDIR /srv/www/todo_app
-RUN poetry config virtualenvs.create false --local && poetry install
-
-RUN adduser nonroot
+RUN apt-get update && apt-get install -y sudo
+RUN  useradd -m nonroot && echo "nonroot:nonroot" | chpasswd && adduser nonroot sudo 
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER nonroot
-
-ENTRYPOINT ./entrypoint.sh
+ENV PATH="~/.poetry/bin/:/srv/www/.venv/bin:/srv/www/todo_app:${PATH}"
+ENV PORT=9000
+RUN sudo chown nonroot /srv/www
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+RUN ~/.poetry/bin/poetry config virtualenvs.create false && ~/.poetry/bin/poetry install
+WORKDIR todo_app
+CMD ./entrypoint.sh
