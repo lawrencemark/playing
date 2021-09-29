@@ -7,7 +7,7 @@ before_install:
   - docker ps -a
 
 script:
-- docker exec -it travisImage "pytest" -p no:warnings /srv/www/todo_app/tests
+  - docker exec -it travisImage "pytest" -p no:warnings /srv/www/todo_app/tests
 
-script:  
-- sh dockerheropush.sh 
+after_success:  
+  - sh dockerheropush.sh 
