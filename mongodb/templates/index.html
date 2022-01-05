@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html>
+<style>
+input[type=text] {
+  width: 35%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+}
+input[type=submit] {
+  width: 35%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  width: auto;
+  font-family: Arial, Helvetica, sans-serif;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+#items {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#items td, #items th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#items tr:nth-child(even){background-color: #f2f2f2;}
+
+#items tr:hover {background-color: #ddd;}
+
+#items th {
+  font-family: Arial, Helvetica, sans-serif;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #45a049;
+  color: white;
+}
+
+
+#div2 {
+  color: white;
+  background-color: #45a049;
+  text-align: center;
+  font-size: x-large;
+  font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+<title>DevOps ToDo List Application</title>
+<body>
+    <div id="div2">
+        <p><b>DevOps To Do List Application</b></p>
+    </div>
+<div>
+    
+    <form action="/" method="POST">
+    <label for="tname">Task Name:</label><br>
+    <input type="text" id="tname" name="tname"></br>
+    <label for="tname">Task Description:</label><br>
+    <textarea id="tdesc" name="tdesc" rows="4" cols="50"></textarea></br>
+    <label for="Status">Choose a Status:</label></br>
+    <select class="dropdown" id="tstatus" name="tstatus">
+    <option value="Not Started">Not Started</option>
+    <option value="Work in Progress">Work in Progress</option>
+    <option value="Completed">Completed</option>
+    <option value="Other">Other</option>
+    </select></br>
+    <input type="submit" value="Submit">
+    </form>
+</div>
+<div>
+<p Current Items Consist Of:</p>
+{% block itemsindb %}
+    {% for i in results %}
+    <table id="items">
+        <hr>
+        <tr>
+            <th>Item Number</th>
+            <th>Item Name </th>
+            <th>Item Description</th>
+            <th>Item Status</th>
+        </tr>
+        <tr>
+            <td>{{ i['Item_number'] }}</td>
+            <td>{{ i['Item_name'] }}</td>
+        <td>{{ i['Item_description'] }}</td>
+        <td>{{ i['Status'] }}</td>
+        </tr>
+   
+        
+        <p>Please update your task accordingly:</p>
+
+        <form action="/update/{{ i['Item_number'] }}" method="POST">
+          <label for="workinprogress">Work in Progress</label>
+          <input type="radio" id="workinprogress" name="status" value="Work in Progress">
+          <label for="completed">Completed</label>
+          <input type="radio" id="completed" name="status" value="Completed">
+          <label for="delete">Delete</label>
+          <input type="radio" id="delete" name="status" value="delete"></br>
+          <input type="submit" value="Submit">
+          
+        </form> 
+        
+
+    {% endfor %}
+   
+{% endblock itemsindb %}
+    </div>
+</body>
+</html>

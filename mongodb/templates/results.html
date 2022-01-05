@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Test App</title>
+</head>
+<style>
+    table, th, td {
+      border: 1px solid black;
+    }
+    </style>
+<body>
+{% for i in results %}
+ <table>
+     <tr>
+         <th>Item Number</th>
+         <th>Item Name </th>
+         <th>Item Description</th>
+         <th>Item Status</th>
+     </tr>
+     <tr>
+         <td>{{ i['Item_number'] }}</td>
+         <td>{{ i['Item_name'] }}</td>
+    <td>{{ i['Item_description'] }}</td>
+    <td>{{ i['Status'] }}</td>
+     </tr>
+     <hr>
+{% endfor %} 
+</table>
+</body>
+</html>

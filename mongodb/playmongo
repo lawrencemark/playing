@@ -1,0 +1,38 @@
+from re import X
+from flask.wrappers import Request
+from pymongo import MongoClient
+import pymongo
+from flask import Flask, render_template, redirect, url_for, request
+
+CONNECTION = 'mongodb+srv://marklawrence:mongodb01@cluster0.ukgck.mongodb.net/myFirstDatabase?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE'
+MONGODB = "todo_list"
+MONGOCOLLECTION = "todo_items"
+
+items = []
+cardsonlist = {}
+
+def mongodb_connection():
+    mongo_client = MongoClient(CONNECTION)
+    dbname = mongo_client[MONGODB]
+    return dbname
+
+def mongodb_getcollections():
+    dbname = mongodb_connection()
+    item_col = dbname[MONGOCOLLECTION]
+    for i in item_col.find():
+        items.append(i)
+
+ 
+mongodb_getcollections()
+
+i = 0 
+while i < len(items):
+    itemNumber =(items[i]['Item_number'])
+    itemName = (items[i]['Item_name'])
+    itemDesciption = (items[i]['Item_description'])
+    itemStatus = (items[i]['Status'])
+    cardsonlist.update({'itemnumber': itemNumber, 'name':itemName,'desc':itemDesciption,'status':itemStatus})
+    i = i + 1
+
+        
+print(cardsonlist)
